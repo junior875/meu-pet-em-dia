@@ -73,6 +73,7 @@ export function LoginForm() {
                 color: 'var(--text-secondary)',
               }}>📧</span>
               <input
+                className="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -93,6 +94,7 @@ export function LoginForm() {
                 color: 'var(--text-secondary)',
               }}>🔒</span>
               <input
+                className="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -108,7 +110,7 @@ export function LoginForm() {
               </a>
             </div>
 
-            <button type="submit" disabled={loading} style={{ width: '100%', padding: '16px', fontSize: 'var(--text-lg)' }}>
+            <button className="submit" type="submit" disabled={loading} style={{ width: '100%', padding: '16px', fontSize: 'var(--text-lg)' }}>
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
