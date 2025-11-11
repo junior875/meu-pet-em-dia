@@ -118,7 +118,7 @@ export function AgendaList({ onEdit, onRefresh, refreshKey }: AgendaListProps) {
       <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap', alignItems: 'flex-end' }}>
         
         <div style={{ minWidth: 200, flex: 1 }}>
-          <label style={{ display: 'block', marginBottom: 8 }}>Nome do Pet</label>
+          <label style={{ display: 'block', marginBottom: 8 }}>Nome</label>
           <input 
               value={filterName} 
               onChange={(e) => setFilterName(e.target.value)} 

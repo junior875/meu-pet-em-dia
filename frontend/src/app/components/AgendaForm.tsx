@@ -44,7 +44,7 @@ export function AgendaForm({ agenda, onSuccess, onCancel }: AgendaFormProps) {
       }
     };
     fetchPets();
-  }, [ /* Dependências vazias */ ]);
+  }, [ ]);
 
   useEffect(() => {
     if (!loadingPets) {
@@ -170,11 +170,26 @@ export function AgendaForm({ agenda, onSuccess, onCancel }: AgendaFormProps) {
       </div>
 
       <div style={{ display: 'flex', gap: '12px', marginTop: 24, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-        <button type="button" onClick={onCancel} disabled={isSubmitting} style={{ background: 'var(--background)', color: 'var(--text-secondary)', border: '1px solid var(--border)', padding: '12px 24px' }}>
-          Cancelar
+        
+        {/* INVERTE A ORDEM DO BOTÃO PRIMÁRIO E SECUNDÁRIO */}
+        
+        <button 
+          data-testid="agenda-submit" 
+          type="submit" 
+          disabled={!canSubmit || pets.length === 0} 
+          style={{ flex: 1, minWidth: 200 }}
+        >
+          {isSubmitting ? 'Enviando...' : (agenda ? '✓ Salvar Alterações' : '✓ Criar Agendamento')}
         </button>
-        <button data-testid="agenda-submit" type="submit" disabled={!canSubmit || pets.length === 0} style={{ padding: '12px 24px', background: 'var(--success)', color: 'white' }}>
-          {isSubmitting ? 'Salvando...' : (agenda ? 'Salvar Alterações' : 'Criar Agendamento')}
+        
+        <button 
+          type="button" 
+          className="secondary" 
+          onClick={onCancel} 
+          disabled={isSubmitting} 
+          style={{ flex: 1, minWidth: 200 }}
+        >
+          ✕ Cancelar
         </button>
       </div>
     </form>
