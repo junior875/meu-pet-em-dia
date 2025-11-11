@@ -1,10 +1,11 @@
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@app/providers/AuthProvider';
 import { LoginForm } from '@app/components/LoginForm';
 import { RegisterForm } from '@app/components/RegisterForm';
 import { Navbar } from '@app/components/Navbar';
 import { AdminUsersPage } from '@app/components/AdminUsersPage';
 import { PetsPage } from '@app/components/PetsPage';
+import { AgendaPage } from '@app/components/AgendaPage'; 
 
 function Protected({ children }: { children: JSX.Element }) {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ function TutorOnly({ children }: { children: JSX.Element }) {
 
 function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const dashboardCards = [
     {
@@ -39,6 +41,7 @@ function Dashboard() {
       subtitle: 'Cadastre e gerencie seus pets',
       color: 'linear-gradient(135deg, #FF6B9D, #E8538A)',
       stats: '0 pets cadastrados',
+      path: '/pets',
     },
     {
       icon: '📅',
@@ -46,6 +49,7 @@ function Dashboard() {
       subtitle: 'Vacinas, consultas e lembretes',
       color: 'linear-gradient(135deg, #4ECDC4, #3BB5AC)',
       stats: 'Próximos 7 dias',
+      path: '/agenda',
     },
     {
       icon: '💉',
@@ -53,6 +57,7 @@ function Dashboard() {
       subtitle: 'Histórico e próximos reforços',
       color: 'linear-gradient(135deg, #FFE66D, #F5D942)',
       stats: 'Tudo em dia',
+      path: '/vacinas',
     },
     {
       icon: '💊',
@@ -60,6 +65,7 @@ function Dashboard() {
       subtitle: 'Controle de uso e dosagem',
       color: 'linear-gradient(135deg, #6BCF7F, #52B869)',
       stats: 'Nenhum ativo',
+      path: '/medicamentos',
     },
   ];
 
@@ -115,6 +121,7 @@ function Dashboard() {
         {dashboardCards.map((card, idx) => (
           <div
             key={idx}
+            onClick={() => navigate(card.path)}
             style={{
               background: 'var(--surface)',
               borderRadius: 'var(--radius-xl)',
@@ -216,7 +223,7 @@ export function RootRouter() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/pets" element={<TutorOnly><PetsPage /></TutorOnly>} />
-          <Route path="/agenda" element={<Protected><div style={{ padding: '32px', textAlign: 'center' }}>Em desenvolvimento...</div></Protected>} />
+          <Route path="/agenda" element={<Protected><AgendaPage /></Protected>} />
           <Route path="/financeiro" element={<Protected><div style={{ padding: '32px', textAlign: 'center' }}>Em desenvolvimento...</div></Protected>} />
           <Route path="/admin/users" element={<AdminOnly><AdminUsersPage /></AdminOnly>} />
           <Route path="*" element={<Navigate to="/" />} />

@@ -13,6 +13,7 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
 db.exec(`
+  -- Users
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -49,6 +50,19 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_pets_owner ON pets(ownerId);
   CREATE INDEX IF NOT EXISTS idx_pets_created ON pets(createdAt DESC);
+
+  -- Agenda
+  CREATE TABLE IF NOT EXISTS agenda (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    petId INTEGER NOT NULL,
+    procedimento TEXT NOT NULL CHECK (procedimento IN ('Banho/Tosa','Vacina','Vermifugo','Antipulgas','Consulta','Outros')),
+    data TEXT NOT NULL,
+    horario TEXT NOT NULL,
+    profissional TEXT,
+    observacoes TEXT,
+    createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY (petId) REFERENCES pets (id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_agenda_pet ON agenda(petId);
+  CREATE INDEX IF NOT EXISTS idx_agenda_data ON agenda(data, horario);
 `);
-
-

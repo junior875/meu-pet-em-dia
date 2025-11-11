@@ -5,6 +5,7 @@ import path from 'node:path';
 import { adminRouter } from './presentation/routes/admin';
 import { authRouter } from './presentation/routes/auth';
 import { petsRouter } from './presentation/routes/pets';
+import { agendaRouter } from './presentation/routes/agenda';
 
 const app = express();
 app.use(cors());
@@ -29,14 +30,14 @@ app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 app.use('/admin', adminRouter);
 // rotas públicas de auth
 app.use('/auth', authRouter);
-// rotas autenticadas de pets (Tutor)
+// rotas autenticadas de pets
 app.use('/pets', petsRouter);
+// rotas autenticadas de agenda
+app.use('/agenda', agendaRouter);
 
 // health check
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-// Error handler
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('[ERROR] Unhandled error:', err?.stack || err);
   res.status(500).json({ message: 'InternalError' });
@@ -47,5 +48,3 @@ app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
   console.log(`ADMIN_KEY set: ${process.env.ADMIN_KEY ? 'yes' : 'no'}`);
 });
-
-
