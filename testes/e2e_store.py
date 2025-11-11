@@ -45,3 +45,12 @@ def get_last_tutors(limit: int = 2) -> List[Tuple[str, str]]:
     return rows
 
 
+def get_last_vets(limit: int = 1) -> List[Tuple[str, str]]:
+    con = _conn()
+    cur = con.execute(
+        "SELECT email, password FROM users WHERE type = 'Veterinário' ORDER BY created_at DESC, id DESC LIMIT ?",
+        (limit,),
+    )
+    rows = cur.fetchall()
+    con.close()
+    return rows
