@@ -20,16 +20,21 @@ export class DeleteRegistroSaude {
     if (!registro) throw new Error('RegistroNotFound');
 
     const pet = this.petRepo.findById(registro.petId);
-    if (!pet || pet.ownerId !== userId) throw new Error('RegistroAccessDenied');
-        
-    const isOwner = pet.ownerId === userId;
-    const isObservacao = registro.tipoRegistro === 'Observação';
-    const isCreator = registro.userId === userId; 
+    if (!pet) throw new Error('PetNotFound');
 
-    if (userType !== 'Tutor' || !isObservacao || !isCreator) {
-        throw new Error('DeletionNotAllowed: Somente o tutor pode remover registros de Observação que ele próprio criou.');
+    if (userType === 'Tutor') {
+      if (pet.ownerId !== userId) {
+        throw new Error('RegistroAccessDenied: Tutor só pode remover registros de seus próprios pets.');
+      }
+      this.registroRepo.delete(registroId);
+      return;
     }
 
-    this.registroRepo.delete(registroId);
+    if (userType === 'Veterinário') {
+      this.registroRepo.delete(registroId);
+      return;
+    }
+
+    throw new Error('DeletionNotAllowed: Tipo de usuário inválido.');
   }
 }
