@@ -5,7 +5,8 @@ import { RegisterForm } from '@app/components/RegisterForm';
 import { Navbar } from '@app/components/Navbar';
 import { AdminUsersPage } from '@app/components/AdminUsersPage';
 import { PetsPage } from '@app/components/PetsPage';
-import { AgendaPage } from '@app/components/AgendaPage'; 
+import { AgendaPage } from '@app/components/AgendaPage';
+import { RegistroSaudePage } from '@app/components/RegistroSaudePage';
 
 function Protected({ children }: { children: JSX.Element }) {
   const { user } = useAuth();
@@ -53,19 +54,19 @@ function Dashboard() {
     },
     {
       icon: '💉',
-      title: 'Vacinas',
+      title: 'Registros de Saúde',
       subtitle: 'Histórico e próximos reforços',
       color: 'linear-gradient(135deg, #FFE66D, #F5D942)',
       stats: 'Tudo em dia',
-      path: '/vacinas',
+      path: '/registros-saude',
     },
     {
-      icon: '💊',
-      title: 'Medicamentos',
-      subtitle: 'Controle de uso e dosagem',
+      icon: '💰',
+      title: 'Financeiro',
+      subtitle: 'Controle de gastos',
       color: 'linear-gradient(135deg, #6BCF7F, #52B869)',
-      stats: 'Nenhum ativo',
-      path: '/medicamentos',
+      stats: 'Em breve',
+      path: '/financeiro',
     },
   ];
 
@@ -202,10 +203,13 @@ function Dashboard() {
         }}>
           Adicione informações sobre seu pet e mantenha tudo organizado em um só lugar.
         </p>
-        <button style={{
-          padding: '14px 32px',
-          fontSize: 'var(--text-lg)',
-        }}>
+        <button 
+          onClick={() => navigate('/pets')}
+          style={{
+            padding: '14px 32px',
+            fontSize: 'var(--text-lg)',
+          }}
+        >
           Adicionar Meu Primeiro Pet
         </button>
       </div>
@@ -224,6 +228,7 @@ export function RootRouter() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/pets" element={<TutorOnly><PetsPage /></TutorOnly>} />
           <Route path="/agenda" element={<Protected><AgendaPage /></Protected>} />
+          <Route path="/registros-saude" element={<Protected><RegistroSaudePage /></Protected>} />
           <Route path="/financeiro" element={<Protected><div style={{ padding: '32px', textAlign: 'center' }}>Em desenvolvimento...</div></Protected>} />
           <Route path="/admin/users" element={<AdminOnly><AdminUsersPage /></AdminOnly>} />
           <Route path="*" element={<Navigate to="/" />} />

@@ -18,7 +18,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     cpf TEXT NOT NULL UNIQUE,
-    type TEXT NOT NULL CHECK (type IN ('Tutor','Veterinário')),
+    type TEXT NOT NULL CHECK (type IN ('Tutor','Veterinário')) DEFAULT 'Tutor',
     email TEXT NOT NULL,
     phone TEXT NOT NULL,
     address TEXT,
@@ -61,8 +61,24 @@ db.exec(`
     profissional TEXT,
     observacoes TEXT,
     createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
-    FOREIGN KEY (petId) REFERENCES pets (id) ON DELETE CASCADE
+    FOREIGN KEY(petId) REFERENCES pets(id) ON DELETE CASCADE
   );
-  CREATE INDEX IF NOT EXISTS idx_agenda_pet ON agenda(petId);
-  CREATE INDEX IF NOT EXISTS idx_agenda_data ON agenda(data, horario);
+
+  -- Registros de Saúde
+  CREATE TABLE IF NOT EXISTS registros_saude (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    petId INTEGER NOT NULL,
+    userId INTEGER NOT NULL, -- Quem criou o registro (Tutor ou Veterinário)
+    tipoRegistro TEXT NOT NULL CHECK (tipoRegistro IN ('Vacina', 'Cirurgia', 'Exame', 'Observação')),
+    data TEXT NOT NULL,
+    horario TEXT NOT NULL,
+    profissional TEXT NOT NULL, -- Obrigatório pelo RFS13
+    filePath TEXT, -- Caminho do arquivo (PDF/PNG/JPG), pode ser NULL
+    createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
+    
+    FOREIGN KEY(petId) REFERENCES pets(id) ON DELETE CASCADE,
+    FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_registros_pet ON registros_saude(petId);
+  CREATE INDEX IF NOT EXISTS idx_registros_data ON registros_saude(data DESC, horario DESC);
 `);

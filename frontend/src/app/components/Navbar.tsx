@@ -18,6 +18,7 @@ export function Navbar() {
     { path: '/', label: 'Dashboard', icon: '🏠' },
     { path: '/pets', label: 'Meus Pets', icon: '🐾' },
     { path: '/agenda', label: 'Agenda', icon: '📅' },
+    { path: '/registros-saude', label: 'Saúde', icon: '💉' },
     { path: '/financeiro', label: 'Financeiro', icon: '💰' },
     ...(user.role === 'admin' ? [{ path: '/admin/users', label: 'Gerenciar usuários', icon: '🧑‍💼' }] : []),
   ];
