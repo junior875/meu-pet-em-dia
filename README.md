@@ -12,6 +12,9 @@ Sistema completo de gestão de saúde para pets, conectando tutores e veterinár
 - 👥 **Dois Tipos de Usuário**: 
   - **Tutores**: Responsáveis pelos pets
   - **Veterinários**: Profissionais de saúde animal (com CRMV)
+- 🐾 **Gestão de Pets**: Cadastro completo com fotos e informações detalhadas
+- 📅 **Agenda Veterinária**: Controle de consultas, vacinas e procedimentos
+- 🏥 **Registros de Saúde**: Histórico médico completo com anexos (receitas, exames)
 - 🎨 **Interface Moderna**: Design responsivo para desktop e mobile
 - 🔒 **Segurança**: Senhas criptografadas com bcrypt
 - 📱 **Validações Brasileiras**: CPF e telefone com máscaras automáticas
@@ -220,6 +223,33 @@ O frontend estará rodando em `http://localhost:5173`
 | PUT | `/admin/users/:id` | Atualizar usuário |
 | DELETE | `/admin/users/:id` | Deletar usuário |
 
+### Pets (`/pets`) - Requer Autenticação (Tutor)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/pets` | Listar pets do tutor (com filtros) |
+| POST | `/pets` | Cadastrar novo pet |
+| PUT | `/pets/:id` | Atualizar pet |
+| DELETE | `/pets/:id` | Deletar pet |
+
+### Agenda (`/agenda`) - Requer Autenticação (Tutor)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/agenda` | Listar agendamentos do tutor |
+| POST | `/agenda` | Criar novo agendamento |
+| PUT | `/agenda/:id` | Atualizar agendamento |
+| DELETE | `/agenda/:id` | Deletar agendamento |
+
+### Registros de Saúde (`/registros-saude`) - Requer Autenticação (Tutor)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/registros-saude` | Listar registros de saúde |
+| POST | `/registros-saude` | Criar novo registro |
+| PUT | `/registros-saude/:id` | Atualizar registro |
+| DELETE | `/registros-saude/:id` | Deletar registro |
+
 ## 🗄️ Modelo de Dados
 
 ### Tabela: `users`
@@ -325,7 +355,7 @@ docker compose down; docker compose build --no-cache frontend; docker compose up
 ```
 
 ### Testes E2E (Selenium)
-Scripts em `testes/`: `test_register_login.py`, `test_pets_flow.py`, `test_admin_users_flow.py`.
+Scripts em `testes/`: `test_register_login.py`, `test_pets_flow.py`, `test_agenda_flow.py`, `test_registrosaude_flow.py`, `test_admin_users_flow.py`.
 
 Executar tudo com delay e janela visível:
 ```powershell
@@ -336,6 +366,8 @@ Individuais:
 ```powershell
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_register_login.py
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_pets_flow.py
+cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_agenda_flow.py
+cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_registrosaude_flow.py
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_admin_users_flow.py
 ```
 

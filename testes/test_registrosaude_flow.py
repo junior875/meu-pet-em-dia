@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.common.keys import Keys
 from e2e_store import get_last_tutors
 from pathlib import Path
 
@@ -24,6 +25,37 @@ def wait_click(drv, locator, timeout=15):
   el = WebDriverWait(drv, timeout).until(EC.element_to_be_clickable(locator))
   drv.execute_script("arguments[0].scrollIntoView({behavior:'smooth',block:'center'});", el)
   drv.execute_script("arguments[0].click();", el)
+  time.sleep(DELAY)
+  return el
+
+def fill_date_input(drv, css_selector: str, day: int, month: int, year: int, timeout: int = 15):
+  el = WebDriverWait(drv, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+  # Try hard clear to handle masked inputs
+  el.click()
+  el.send_keys(Keys.CONTROL, 'a')
+  el.send_keys(Keys.DELETE)
+  t = (el.get_attribute('type') or '').lower()
+  placeholder = (el.get_attribute('placeholder') or '').lower()
+  if t == 'date':
+    el.send_keys(f"{year:04d}-{month:02d}-{day:02d}")
+  else:
+    # Most masks accept only digits; slashes are added automatically
+    el.send_keys(f"{day:02d}{month:02d}{year:04d}")
+  time.sleep(DELAY)
+  return el
+
+def fill_time_input(drv, css_selector: str, hour: int, minute: int, timeout: int = 15):
+  el = WebDriverWait(drv, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+  el.click()
+  el.send_keys(Keys.CONTROL, 'a')
+  el.send_keys(Keys.DELETE)
+  t = (el.get_attribute('type') or '').lower()
+  placeholder = (el.get_attribute('placeholder') or '').lower()
+  if t == 'time':
+    el.send_keys(f"{hour:02d}:{minute:02d}")
+  else:
+    # Text inputs with time masks usually accept digits only
+    el.send_keys(f"{hour:02d}{minute:02d}")
   time.sleep(DELAY)
   return el
 
@@ -142,8 +174,8 @@ def create_registro(drv, title: str):
   selected_text = tipo_select_after.first_selected_option.text.lower()
   if "vacina" not in selected_text:
     raise SystemExit("❌ Tipo de registro não foi selecionado como 'Vacina' — abortando para evitar DeletionNotAllowed.")
-  wait_type(drv, (By.CSS_SELECTOR, "input[data-testid='registro-data']"), "2025-12-25")
-  wait_type(drv, (By.CSS_SELECTOR, "input[data-testid='registro-horario']"), "15:30")
+  fill_date_input(drv, "input[data-testid='registro-data']", day=25, month=12, year=2025)
+  fill_time_input(drv, "input[data-testid='registro-horario']", hour=15, minute=30)
   wait_type(drv, (By.CSS_SELECTOR, "input[data-testid='registro-profissional']"), "Dr. Teste Automatizado")
   try:
     dummy_doc = create_dummy_file("arquivo_teste.pdf")
@@ -162,8 +194,8 @@ def edit_first_registro(drv):
   drv.execute_script("arguments[0].click()", btn)
   new_prof = f"Dr. Editado {random.randint(1000,9999)}"
   wait_type(drv, (By.CSS_SELECTOR, "input[data-testid='registro-profissional']"), new_prof)
-  wait_type(drv, (By.CSS_SELECTOR, "input[data-testid='registro-data']"), "2025-12-31")
-  wait_type(drv, (By.CSS_SELECTOR, "input[data-testid='registro-horario']"), "10:45")
+  fill_date_input(drv, "input[data-testid='registro-data']", day=31, month=12, year=2025)
+  fill_time_input(drv, "input[data-testid='registro-horario']", hour=10, minute=45)
   submit = WebDriverWait(drv, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='registro-submit']")))
   drv.execute_script("arguments[0].click()", submit)
   WebDriverWait(drv, 10).until(EC.presence_of_element_located((By.XPATH, f"//*[contains(text(), '{new_prof}')]")))

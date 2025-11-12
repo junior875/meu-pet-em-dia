@@ -10,11 +10,13 @@
 7. [Autenticação e Autorização](#autenticação-e-autorização)
 8. [Gestão de Usuários](#gestão-de-usuários)
 9. [Gestão de Pets](#gestão-de-pets)
-10. [Upload de Arquivos](#upload-de-arquivos)
-11. [Testes End-to-End com Selenium](#testes-end-to-end-com-selenium)
-12. [Docker e Ambientes Isolados](#docker-e-ambientes-isolados)
-13. [Deploy e Produção](#deploy-e-produção)
-14. [Troubleshooting](#troubleshooting)
+10. [Agenda de Consultas e Procedimentos](#agenda-de-consultas-e-procedimentos)
+11. [Registros de Saúde](#registros-de-saúde)
+12. [Upload de Arquivos](#upload-de-arquivos)
+13. [Testes End-to-End com Selenium](#testes-end-to-end-com-selenium)
+14. [Docker e Ambientes Isolados](#docker-e-ambientes-isolados)
+15. [Deploy e Produção](#deploy-e-produção)
+16. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -253,6 +255,42 @@ CREATE TABLE IF NOT EXISTS pets (
 );
 CREATE INDEX IF NOT EXISTS idx_pets_owner ON pets(ownerId);
 CREATE INDEX IF NOT EXISTS idx_pets_created ON pets(createdAt DESC);
+```
+
+#### Tabela `agenda`
+```sql
+CREATE TABLE IF NOT EXISTS agenda (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  petId INTEGER NOT NULL,
+  procedimento TEXT NOT NULL,
+  data TEXT NOT NULL,
+  horario TEXT NOT NULL,
+  profissional TEXT NOT NULL,
+  observacoes TEXT,
+  createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
+  FOREIGN KEY(petId) REFERENCES pets(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_agenda_pet ON agenda(petId);
+CREATE INDEX IF NOT EXISTS idx_agenda_data ON agenda(data);
+```
+
+#### Tabela `registros_saude`
+```sql
+CREATE TABLE IF NOT EXISTS registros_saude (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  petId INTEGER NOT NULL,
+  tipo TEXT NOT NULL CHECK (tipo IN ('Vacina','Consulta','Cirurgia','Exame','Medicamento','Outros')),
+  data TEXT NOT NULL,
+  horario TEXT NOT NULL,
+  profissional TEXT NOT NULL,
+  observacoes TEXT,
+  arquivoPath TEXT,
+  createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
+  FOREIGN KEY(petId) REFERENCES pets(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_registros_pet ON registros_saude(petId);
+CREATE INDEX IF NOT EXISTS idx_registros_data ON registros_saude(data DESC);
+CREATE INDEX IF NOT EXISTS idx_registros_tipo ON registros_saude(tipo);
 ```
 
 ### Acessar o Banco Diretamente
@@ -603,13 +641,244 @@ Authorization: Bearer <token>
 
 **Atenção:** A exclusão de um pet remove também:
 - Arquivo de foto (se existir)
-- Futuramente: agendamentos e histórico de saúde associados
+- Todos os agendamentos associados (`ON DELETE CASCADE`)
+- Todos os registros de saúde associados (`ON DELETE CASCADE`)
 
 ### Validações de Pet
 
 - **Nome:** Obrigatório, 3-100 caracteres
 - **Espécie:** Obrigatório, um dos valores: `Cachorro`, `Cavalo`, `Gato`, `Outros`
 - **Foto:** Opcional, formatos aceitos: PNG, JPG, JPEG, WEBP, GIF (até 5MB)
+
+---
+
+## Agenda de Consultas e Procedimentos
+
+### Rotas de Agenda (Requer Autenticação)
+
+Todas as rotas de agenda exigem autenticação via JWT e estão restritas a usuários do tipo `Tutor`.
+
+#### 1. Listar Agendamentos (RFS09)
+
+**Endpoint:** `GET /agenda?petId=`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `petId` (opcional): Filtrar por pet específico
+
+**Resposta (200):**
+```json
+[
+  {
+    "id": 1,
+    "petId": 2,
+    "procedimento": "Consulta",
+    "data": "2025-12-31",
+    "horario": "15:30",
+    "profissional": "Dr. João Silva",
+    "observacoes": "Consulta de rotina",
+    "createdAt": "2025-11-12 10:30:00"
+  },
+  ...
+]
+```
+
+**Ordenação padrão:** Por data de agendamento (crescente - próximos primeiro).
+
+#### 2. Criar Agendamento (RFS10)
+
+**Endpoint:** `POST /agenda`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Tipo de Requisição:** `application/json`
+
+**Campos obrigatórios:**
+- `petId`: ID do pet (número)
+- `procedimento`: Tipo do procedimento (ex: `Consulta`, `Vacina`, `Cirurgia`, `Exame`)
+- `data`: Data do agendamento (formato: `YYYY-MM-DD`)
+- `horario`: Horário (formato: `HH:MM`)
+- `profissional`: Nome do profissional/clínica
+
+**Campos opcionais:**
+- `observacoes`: Observações adicionais
+
+**Resposta (201):**
+```json
+{
+  "id": 1,
+  "petId": 2,
+  "procedimento": "Consulta",
+  ...
+}
+```
+
+#### 3. Atualizar Agendamento (RFS11)
+
+**Endpoint:** `PUT /agenda/:id`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Tipo de Requisição:** `application/json`
+
+**Campos:** Todos os campos de `POST /agenda` são opcionais. Campos não enviados mantêm seus valores atuais.
+
+**Resposta (200):**
+```json
+{
+  "id": 1,
+  ...
+}
+```
+
+#### 4. Deletar Agendamento (RFS12)
+
+**Endpoint:** `DELETE /agenda/:id`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Resposta (204):** Sem conteúdo.
+
+### Validações de Agenda
+
+- **Pet:** Obrigatório, deve pertencer ao tutor autenticado
+- **Procedimento:** Obrigatório
+- **Data:** Obrigatório, formato `YYYY-MM-DD`
+- **Horário:** Obrigatório, formato `HH:MM`
+- **Profissional:** Obrigatório
+
+---
+
+## Registros de Saúde
+
+### Rotas de Registros de Saúde (Requer Autenticação)
+
+Todas as rotas de registros de saúde exigem autenticação via JWT e estão restritas a usuários do tipo `Tutor`.
+
+#### 1. Listar Registros de Saúde (RFS13)
+
+**Endpoint:** `GET /registros-saude?petId=&tipo=`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+- `petId` (opcional): Filtrar por pet específico
+- `tipo` (opcional): Filtrar por tipo de registro (ex: `Vacina`, `Consulta`, `Cirurgia`, `Exame`)
+
+**Resposta (200):**
+```json
+[
+  {
+    "id": 1,
+    "petId": 2,
+    "tipo": "Vacina",
+    "data": "2025-12-25",
+    "horario": "15:30",
+    "profissional": "Dr. Maria Santos",
+    "observacoes": "V10 - Primeira dose",
+    "arquivoPath": "/uploads/registros/registro-1234567890.pdf",
+    "createdAt": "2025-11-12 10:30:00"
+  },
+  ...
+]
+```
+
+**Ordenação padrão:** Por data decrescente (mais recentes primeiro).
+
+#### 2. Criar Registro de Saúde (RFS14)
+
+**Endpoint:** `POST /registros-saude`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Tipo de Requisição:** `multipart/form-data`
+
+**Campos obrigatórios:**
+- `petId`: ID do pet (número)
+- `tipo`: Tipo do registro (`Vacina`, `Consulta`, `Cirurgia`, `Exame`, `Medicamento`, `Outros`)
+- `data`: Data do registro (formato: `YYYY-MM-DD` ou `DD/MM/YYYY`)
+- `horario`: Horário (formato: `HH:MM`)
+- `profissional`: Nome do profissional/clínica
+
+**Campos opcionais:**
+- `observacoes`: Observações detalhadas
+- `arquivo`: Upload do documento (receita, exame, certificado de vacina, etc.)
+
+**Resposta (201):**
+```json
+{
+  "id": 1,
+  "petId": 2,
+  "tipo": "Vacina",
+  "arquivoPath": "/uploads/registros/registro-1234567890.pdf",
+  ...
+}
+```
+
+#### 3. Atualizar Registro de Saúde (RFS15)
+
+**Endpoint:** `PUT /registros-saude/:id`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Tipo de Requisição:** `multipart/form-data`
+
+**Campos:** Todos os campos de `POST /registros-saude` são opcionais. Campos não enviados mantêm seus valores atuais.
+
+**Resposta (200):**
+```json
+{
+  "id": 1,
+  ...
+}
+```
+
+#### 4. Deletar Registro de Saúde (RFS16)
+
+**Endpoint:** `DELETE /registros-saude/:id`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Resposta (204):** Sem conteúdo.
+
+**Observação:** Apenas registros do tipo `Vacina` podem ser deletados. Outros tipos retornam erro 403 para preservar histórico médico.
+
+**Atenção:** A exclusão de um registro remove também:
+- Arquivo anexo (se existir)
+
+### Validações de Registro de Saúde
+
+- **Pet:** Obrigatório, deve pertencer ao tutor autenticado
+- **Tipo:** Obrigatório, um dos valores: `Vacina`, `Consulta`, `Cirurgia`, `Exame`, `Medicamento`, `Outros`
+- **Data:** Obrigatório, formato `YYYY-MM-DD` ou `DD/MM/YYYY`
+- **Horário:** Obrigatório, formato `HH:MM`
+- **Profissional:** Obrigatório
+- **Arquivo:** Opcional, formatos aceitos: PDF, PNG, JPG, JPEG (até 10MB)
 
 ---
 
@@ -663,11 +932,13 @@ http://localhost:3001/uploads/pet-1699999999999-123456789.jpg
 
 ### Estrutura dos Testes
 
-Os testes E2E estão localizados no diretório `testes/` e cobrem três fluxos principais:
+Os testes E2E estão localizados no diretório `testes/` e cobrem cinco fluxos principais:
 
 1. **test_register_login.py**: Registro e login/logout de usuários
 2. **test_pets_flow.py**: Gestão de pets (criar, editar, deletar)
-3. **test_admin_users_flow.py**: Gestão de usuários pelo administrador
+3. **test_agenda_flow.py**: Gestão de agenda (criar, editar, deletar agendamentos)
+4. **test_registrosaude_flow.py**: Gestão de registros de saúde (criar, editar, deletar)
+5. **test_admin_users_flow.py**: Gestão de usuários pelo administrador
 
 ### Configuração do Ambiente de Testes
 
@@ -720,6 +991,12 @@ $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_register_logi
 # Gestão de pets
 $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_pets_flow.py
 
+# Gestão de agenda
+$env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_agenda_flow.py
+
+# Gestão de registros de saúde
+$env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_registrosaude_flow.py
+
 # Gestão de usuários (admin)
 $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_admin_users_flow.py
 ```
@@ -766,7 +1043,50 @@ $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_admin_users_f
 - Todas as edições e exclusões bem-sucedidas
 - Modais e confirmações funcionando corretamente
 
-#### 3. test_admin_users_flow.py
+#### 3. test_agenda_flow.py
+
+**Objetivo:** Validar a gestão completa de agendamentos por um tutor.
+
+**Ações:**
+1. Carrega as credenciais dos 2 últimos tutores criados em `e2e_store.db`
+2. Para cada tutor:
+   - Faz login
+   - Cria 3 pets
+   - Acessa a aba "Agenda"
+   - Cria 3 agendamentos com dados aleatórios
+   - Edita os 3 agendamentos (alterando horário)
+   - Deleta todos os agendamentos (com confirmação)
+   - Deleta todos os pets
+   - Faz logout
+
+**Resultado esperado:**
+- 6 agendamentos criados (3 por tutor)
+- Todas as edições e exclusões bem-sucedidas
+- Validação de campos de data e hora funcionando
+
+#### 4. test_registrosaude_flow.py
+
+**Objetivo:** Validar a gestão completa de registros de saúde por um tutor.
+
+**Ações:**
+1. Carrega as credenciais dos 2 últimos tutores criados em `e2e_store.db`
+2. Para cada tutor:
+   - Faz login
+   - Cria 2 pets
+   - Acessa a aba "Registros de Saúde"
+   - Cria 2 registros do tipo "Vacina" com upload de arquivo
+   - Edita o primeiro registro (alterando profissional e data)
+   - Deleta todos os registros (com confirmação)
+   - Deleta todos os pets
+   - Faz logout
+
+**Resultado esperado:**
+- 4 registros de saúde criados (2 por tutor)
+- Upload de arquivos funcionando
+- Todas as edições e exclusões bem-sucedidas
+- Validação de campos de data e hora funcionando
+
+#### 5. test_admin_users_flow.py
 
 **Objetivo:** Validar a gestão de usuários pelo administrador.
 
@@ -777,7 +1097,7 @@ $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_admin_users_f
 4. Cria 5 novos usuários do tipo Tutor com dados aleatórios
 5. Para cada usuário criado:
    - Clica no botão "Editar"
-   - Altera um atributo (ex: telefone)
+   - Altera um atributo (ex: endereço)
    - Salva as alterações
 6. Para cada usuário criado:
    - Clica no botão "Deletar"
@@ -800,6 +1120,14 @@ Para garantir a estabilidade dos testes, os componentes do frontend utilizam atr
 - `data-testid="btn-open-pet-modal"`: Botão para abrir o modal de cadastro de pet
 - `data-testid="pet-edit-{id}"`: Botão de editar pet
 - `data-testid="pet-delete-{id}"`: Botão de deletar pet
+- `data-testid="btn-open-agenda-modal"`: Botão para abrir o modal de agendamento
+- `data-testid="agenda-modal"`: Modal de agendamento
+- `data-testid="registro-pet"`: Select de pet no formulário de registro de saúde
+- `data-testid="registro-tipo"`: Select de tipo de registro
+- `data-testid="registro-data"`: Input de data do registro
+- `data-testid="registro-horario"`: Input de horário do registro
+- `data-testid="registro-profissional"`: Input do profissional
+- `data-testid="registro-submit"`: Botão de submissão do formulário de registro
 
 **Exemplo de uso no teste:**
 ```python

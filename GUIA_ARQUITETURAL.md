@@ -1,6 +1,7 @@
 # Guia Arquitetural - Meu Pet em Dia
 
 ## Índice
+
 1. [Visão Geral da Arquitetura](#visão-geral-da-arquitetura)
 2. [Arquitetura do Backend](#arquitetura-do-backend)
 3. [Arquitetura do Frontend](#arquitetura-do-frontend)
@@ -76,15 +77,15 @@ O sistema **Meu Pet em Dia** segue uma arquitetura **cliente-servidor** clássic
 
 ### Componentes Principais
 
-| Componente | Tecnologia | Responsabilidade |
-|------------|-----------|------------------|
-| **Frontend** | React 18 + TypeScript + Vite | Interface do usuário, validações client-side, gerenciamento de estado |
-| **Backend** | Node.js + Express.js + TypeScript | Lógica de negócios, validações, autenticação, persistência |
-| **Banco de Dados** | SQLite (better-sqlite3) | Armazenamento persistente de usuários e pets |
-| **Autenticação** | JWT (jsonwebtoken) + Bcrypt | Geração de tokens, verificação de identidade, hash de senhas |
-| **Upload de Arquivos** | Multer | Processamento de fotos de pets e documentos de veterinários |
-| **Proxy Reverso** | Nginx (Docker) | Servir arquivos estáticos do frontend e proxy para API |
-| **Testes E2E** | Selenium WebDriver (Python) | Testes automatizados de fluxos completos |
+| Componente                   | Tecnologia                        | Responsabilidade                                                         |
+| ---------------------------- | --------------------------------- | ------------------------------------------------------------------------ |
+| **Frontend**           | React 18 + TypeScript + Vite      | Interface do usuário, validações client-side, gerenciamento de estado |
+| **Backend**            | Node.js + Express.js + TypeScript | Lógica de negócios, validações, autenticação, persistência        |
+| **Banco de Dados**     | SQLite (better-sqlite3)           | Armazenamento persistente de usuários e pets                            |
+| **Autenticação**     | JWT (jsonwebtoken) + Bcrypt       | Geração de tokens, verificação de identidade, hash de senhas         |
+| **Upload de Arquivos** | Multer                            | Processamento de fotos de pets e documentos de veterinários             |
+| **Proxy Reverso**      | Nginx (Docker)                    | Servir arquivos estáticos do frontend e proxy para API                  |
+| **Testes E2E**         | Selenium WebDriver (Python)       | Testes automatizados de fluxos completos                                 |
 
 ---
 
@@ -106,25 +107,41 @@ backend/src/
 │   ├── UpdateUser.ts          # [RFS02] Alterar Usuário
 │   ├── password.ts            # Hash e verificação de senha
 │   ├── validators.ts          # Validações de nome, CPF, email, etc.
-│   └── pets/
-│       ├── CreatePet.ts       # [RFS05] Cadastrar Pet
-│       ├── UpdatePet.ts       # [RFS06] Alterar Pet
-│       ├── DeletePet.ts       # [RFS07] Deletar Pet
-│       └── ListPets.ts        # [RFS08] Listar Pets
+│   ├── pets/
+│   │   ├── CreatePet.ts       # [RFS05] Cadastrar Pet
+│   │   ├── UpdatePet.ts       # [RFS06] Alterar Pet
+│   │   ├── DeletePet.ts       # [RFS07] Deletar Pet
+│   │   └── ListPets.ts        # [RFS08] Listar Pets
+│   ├── agenda/
+│   │   ├── CreateAgenda.ts    # [RFS10] Criar Agendamento
+│   │   ├── UpdateAgenda.ts    # [RFS11] Alterar Agendamento
+│   │   ├── DeleteAgenda.ts    # [RFS12] Deletar Agendamento
+│   │   └── ListAgendaByPet.ts # [RFS09] Listar Agendamentos
+│   └── registroSaude/
+│       ├── CreateRegistroSaude.ts  # [RFS14] Criar Registro de Saúde
+│       ├── UpdateRegistroSaude.ts  # [RFS15] Alterar Registro de Saúde
+│       ├── DeleteRegistroSaude.ts  # [RFS16] Deletar Registro de Saúde
+│       └── ListRegistroSaude.ts    # [RFS13] Listar Registros de Saúde
 │
 ├── infrastructure/            # Camada de Infraestrutura
 │   ├── db.ts                  # Configuração e inicialização do SQLite
 │   └── repositories/
-│       ├── UserRepository.ts          # Interface do repositório de usuários
-│       ├── SqliteUserRepository.ts    # Implementação SQLite
-│       ├── PetRepository.ts           # Interface do repositório de pets
-│       └── SqlitePetRepository.ts     # Implementação SQLite
+│       ├── UserRepository.ts              # Interface do repositório de usuários
+│       ├── SqliteUserRepository.ts        # Implementação SQLite
+│       ├── PetRepository.ts               # Interface do repositório de pets
+│       ├── SqlitePetRepository.ts         # Implementação SQLite
+│       ├── AgendaRepository.ts            # Interface do repositório de agenda
+│       ├── SqliteAgendaRepository.ts      # Implementação SQLite
+│       ├── RegistroSaudeRepository.ts     # Interface do repositório de registros
+│       └── SqliteRegistroSaudeRepository.ts # Implementação SQLite
 │
 ├── presentation/              # Camada de Apresentação (API)
 │   ├── routes/
 │   │   ├── auth.ts            # Rotas públicas: /auth/register, /auth/login
 │   │   ├── admin.ts           # Rotas admin: /admin/users (CRUD)
-│   │   └── pets.ts            # Rotas pets: /pets (CRUD)
+│   │   ├── pets.ts            # Rotas pets: /pets (CRUD)
+│   │   ├── agenda.ts          # Rotas agenda: /agenda (CRUD)
+│   │   └── registroSaude.ts   # Rotas registros: /registros-saude (CRUD)
 │   └── middleware/
 │       └── auth.ts            # Middleware de autenticação JWT
 │
@@ -173,6 +190,7 @@ backend/src/
 ### Responsabilidades das Camadas
 
 #### 1. Domain (Domínio)
+
 - **Responsabilidade:** Definir as entidades e regras de negócio fundamentais.
 - **Independência:** Não depende de nenhuma outra camada.
 - **Exemplos:**
@@ -181,6 +199,7 @@ backend/src/
   - `UserType`, `UserRole`, `PetSpecies`, `PetSex`: Tipos e enums
 
 #### 2. Application (Aplicação)
+
 - **Responsabilidade:** Orquestrar casos de uso (use cases), validações e lógica de negócios.
 - **Independência:** Depende apenas da camada de Domain.
 - **Exemplos:**
@@ -189,6 +208,7 @@ backend/src/
   - `validators.ts`: Funções de validação reutilizáveis
 
 #### 3. Infrastructure (Infraestrutura)
+
 - **Responsabilidade:** Lidar com detalhes técnicos (banco de dados, arquivos, APIs externas).
 - **Independência:** Depende de Domain e Application.
 - **Exemplos:**
@@ -197,6 +217,7 @@ backend/src/
   - `SqlitePetRepository`: Implementação do padrão Repository para pets
 
 #### 4. Presentation (Apresentação)
+
 - **Responsabilidade:** Expor a API REST, lidar com requisições HTTP, autenticação e autorização.
 - **Independência:** Depende de todas as outras camadas.
 - **Exemplos:**
@@ -293,15 +314,18 @@ frontend/src/
 **Responsabilidade:** Gerenciar estado de autenticação global.
 
 **Estado:**
+
 - `user`: Dados do usuário autenticado (ou `null`)
 - `token`: JWT armazenado no localStorage
 
 **Métodos:**
+
 - `login(email, password)`: Faz login e armazena token
 - `register(formData)`: Registra novo usuário e faz login automático
 - `logout()`: Remove token e limpa estado
 
 **Uso:**
+
 ```typescript
 const { user, token, login, logout } = useAuth();
 ```
@@ -309,10 +333,12 @@ const { user, token, login, logout } = useAuth();
 #### 2. React Router (Navegação)
 
 **Rotas Públicas:**
+
 - `/login`: LoginForm
 - `/register`: RegisterForm
 
 **Rotas Protegidas:**
+
 - `/`: Dashboard (Protected)
 - `/pets`: PetsPage (TutorOnly)
 - `/agenda`: Em desenvolvimento (Protected)
@@ -320,6 +346,7 @@ const { user, token, login, logout } = useAuth();
 - `/admin/users`: AdminUsersPage (AdminOnly)
 
 **Guardas de Rota:**
+
 - `Protected`: Verifica se `user !== null`
 - `AdminOnly`: Verifica se `user.role === 'admin'`
 - `TutorOnly`: Verifica se `user.type === 'Tutor'`
@@ -329,12 +356,14 @@ const { user, token, login, logout } = useAuth();
 **Responsabilidade:** Exibir mensagens de sucesso, erro, aviso e informação.
 
 **Tipos:**
+
 - `success`: Operação bem-sucedida (verde)
 - `error`: Erro (vermelho)
 - `warning`: Aviso (amarelo)
 - `info`: Informação (azul)
 
 **Uso:**
+
 ```typescript
 const toast = useToast();
 toast.show('Usuário criado com sucesso!', 'success');
@@ -405,29 +434,47 @@ toast.show('CPF inválido', 'error');
 
 #### Rotas Públicas (auth.ts)
 
-| Método | Endpoint | Descrição | Autenticação |
-|--------|----------|-----------|--------------|
-| POST | `/auth/register` | Registrar novo usuário | Não |
-| POST | `/auth/login` | Fazer login | Não |
-| GET | `/auth/me` | Obter dados do usuário autenticado | JWT |
+| Método | Endpoint           | Descrição                         | Autenticação |
+| ------- | ------------------ | ----------------------------------- | -------------- |
+| POST    | `/auth/register` | Registrar novo usuário             | Não           |
+| POST    | `/auth/login`    | Fazer login                         | Não           |
+| GET     | `/auth/me`       | Obter dados do usuário autenticado | JWT            |
 
 #### Rotas Administrativas (admin.ts)
 
-| Método | Endpoint | Descrição | Autenticação |
-|--------|----------|-----------|--------------|
-| GET | `/admin/users?type=&q=` | Listar usuários (com filtros) | Admin Key |
-| POST | `/admin/users` | Criar usuário | Admin Key |
-| PUT | `/admin/users/:id` | Atualizar usuário | Admin Key |
-| DELETE | `/admin/users/:id` | Deletar usuário | Admin Key |
+| Método | Endpoint                  | Descrição                    | Autenticação |
+| ------- | ------------------------- | ------------------------------ | -------------- |
+| GET     | `/admin/users?type=&q=` | Listar usuários (com filtros) | Admin Key      |
+| POST    | `/admin/users`          | Criar usuário                 | Admin Key      |
+| PUT     | `/admin/users/:id`      | Atualizar usuário             | Admin Key      |
+| DELETE  | `/admin/users/:id`      | Deletar usuário               | Admin Key      |
 
 #### Rotas de Pets (pets.ts)
 
-| Método | Endpoint | Descrição | Autenticação |
-|--------|----------|-----------|--------------|
-| GET | `/pets?name=&species=` | Listar pets do tutor | JWT (Tutor) |
-| POST | `/pets` | Criar pet | JWT (Tutor) |
-| PUT | `/pets/:id` | Atualizar pet | JWT (Tutor) |
-| DELETE | `/pets/:id` | Deletar pet | JWT (Tutor) |
+| Método | Endpoint                 | Descrição          | Autenticação |
+| ------- | ------------------------ | -------------------- | -------------- |
+| GET     | `/pets?name=&species=` | Listar pets do tutor | JWT (Tutor)    |
+| POST    | `/pets`                | Criar pet            | JWT (Tutor)    |
+| PUT     | `/pets/:id`            | Atualizar pet        | JWT (Tutor)    |
+| DELETE  | `/pets/:id`            | Deletar pet          | JWT (Tutor)    |
+
+#### Rotas de Agenda (agenda.ts)
+
+| Método | Endpoint          | Descrição              | Autenticação |
+| ------- | ----------------- | ------------------------ | -------------- |
+| GET     | `/agenda?petId=` | Listar agendamentos     | JWT (Tutor)    |
+| POST    | `/agenda`        | Criar agendamento       | JWT (Tuor)    |
+| PUT     | `/agenda/:id`    | Atualizar agendamento   | JWT (Tutor)    |
+| DELETE  | `/agenda/:id`    | Deletar agendamento     | JWT (Tutor)    |
+
+#### Rotas de Registros de Saúde (registroSaude.ts)
+
+| Método | Endpoint                        | Descrição                 | Autenticação |
+| ------- | ------------------------------- | --------------------------- | -------------- |
+| GET     | `/registros-saude?petId=&tipo=` | Listar registros de saúde | JWT (Tutor)    |
+| POST    | `/registros-saude`             | Criar registro            | JWT (Tutor)    |
+| PUT     | `/registros-saude/:id`         | Atualizar registro        | JWT (Tutor)    |
+| DELETE  | `/registros-saude/:id`         | Deletar registro          | JWT (Tutor)    |
 
 ### Tratamento de Erros
 
@@ -611,15 +658,18 @@ usuários"        ↓            editar usuário        ↓
 **Objetivo:** Abstrair o acesso a dados, desacoplando a lógica de negócios da implementação do banco de dados.
 
 **Implementação:**
+
 - **Interface:** `UserRepository`, `PetRepository` (em `infrastructure/repositories/`)
 - **Implementação Concreta:** `SqliteUserRepository`, `SqlitePetRepository`
 
 **Vantagens:**
+
 - Facilita testes (mock de repositórios)
 - Permite trocar o banco de dados (ex: SQLite → PostgreSQL) sem alterar casos de uso
 - Centraliza consultas SQL em um único lugar
 
 **Exemplo:**
+
 ```typescript
 // Interface
 export interface UserRepository {
@@ -659,10 +709,12 @@ export class CreateUser {
 **Objetivo:** Reduzir acoplamento entre classes, facilitando testes e manutenção.
 
 **Implementação:**
+
 - Os casos de uso recebem repositórios via construtor
 - As rotas instanciam repositórios e casos de uso
 
 **Exemplo:**
+
 ```typescript
 // Caso de uso
 export class CreatePet {
@@ -688,12 +740,14 @@ petsRouter.post('/', (req, res) => {
 **Objetivo:** Cada classe/função deve ter uma única responsabilidade.
 
 **Implementação:**
+
 - **Validadores:** Separados em `validators.ts` (isValidCPF, isValidEmail, etc.)
 - **Password:** Hash e verificação em `password.ts`
 - **Use Cases:** Um caso de uso por operação (CreateUser, UpdateUser, DeleteUser)
 - **Repositories:** Apenas acesso a dados (sem lógica de negócios)
 
 **Exemplo:**
+
 ```typescript
 // validators.ts - APENAS validações
 export function isValidCPF(cpf: string): boolean { /* ... */ }
@@ -718,10 +772,12 @@ export class CreateUser {
 **Objetivo:** Centralizar a criação de objetos complexos.
 
 **Implementação:**
+
 - Função `signToken()` em `auth.ts` encapsula a criação de JWT
-- Função `toSafeUser()` cria uma versão segura do usuário (sem passwordHash)
+- Função `toSafeUser()` cria uma versão segura do usuário 
 
 **Exemplo:**
+
 ```typescript
 function signToken(payload: any): string {
   const secret = process.env.JWT_SECRET || 'dev-secret';
@@ -739,11 +795,13 @@ function toSafeUser(u: any) {
 **Objetivo:** Adicionar funcionalidades de forma modular (autenticação, logging, validação).
 
 **Implementação:**
+
 - `requireAuth`: Verifica JWT e adiciona `req.user`
 - Request logger: Registra todas as requisições
 - Error handler: Captura erros não tratados
 
 **Exemplo:**
+
 ```typescript
 // Middleware de autenticação
 export function requireAuth(req, res, next) {
@@ -767,10 +825,12 @@ petsRouter.use(requireAuth);  // Todas as rotas de pets exigem autenticação
 **Objetivo:** Compartilhar estado global (autenticação) entre componentes sem prop drilling.
 
 **Implementação:**
+
 - `AuthProvider` encapsula lógica de autenticação
 - `useAuth()` hook para acessar contexto
 
 **Exemplo:**
+
 ```typescript
 // Provider
 export function AuthProvider({ children }) {
@@ -804,6 +864,7 @@ function MyComponent() {
 ### 1. Autenticação JWT (JSON Web Token)
 
 **Fluxo:**
+
 1. User faz login com email e senha
 2. Backend verifica credenciais
 3. Backend gera JWT assinado com `JWT_SECRET` contendo `{ id, role }`
@@ -812,6 +873,7 @@ function MyComponent() {
 6. Backend verifica assinatura do JWT e extrai dados do usuário
 
 **Estrutura do JWT:**
+
 ```json
 {
   "id": 1,
@@ -822,6 +884,7 @@ function MyComponent() {
 ```
 
 **Verificação:**
+
 ```typescript
 const secret = process.env.JWT_SECRET || 'dev-secret';
 const payload = jwt.verify(token, secret) as any;
@@ -831,10 +894,12 @@ const payload = jwt.verify(token, secret) as any;
 ### 2. Hash de Senhas com Bcrypt
 
 **Armazenamento:**
+
 - Senhas **NUNCA** são armazenadas em texto plano
 - Bcrypt gera hash com salt automático (custo 10)
 
 **Exemplo:**
+
 ```typescript
 import bcrypt from 'bcrypt';
 
@@ -852,11 +917,13 @@ export function verifyPassword(plain: string, hash: string): boolean {
 ### 3. Validações e Sanitização
 
 **Client-side (Frontend):**
+
 - Validação de formato (CPF, email, telefone)
 - Máscaras automáticas (CPF: 000.000.000-00, Telefone: (00) 00000-0000)
 - Validação de senha forte (8-12 chars, maiúscula, número, especial)
 
 **Server-side (Backend):**
+
 - Revalidação de **todos** os campos (nunca confiar no cliente)
 - Normalização de CPF (remove máscara antes de salvar)
 - Verificação de duplicidade (CPF, email)
@@ -865,14 +932,17 @@ export function verifyPassword(plain: string, hash: string): boolean {
 ### 4. Controle de Acesso Baseado em Roles (RBAC)
 
 **Roles:**
+
 - `admin`: Acesso total ao sistema
 - `user`: Acesso básico (Tutor ou Veterinário)
 
 **Tipos de Usuário:**
+
 - `Tutor`: Pode gerenciar pets
 - `Veterinário`: Pode acessar consultas (futuro)
 
 **Middleware de Autorização:**
+
 ```typescript
 // Apenas admin
 if (req.user.role !== 'admin') {
@@ -890,10 +960,12 @@ if (req.user.type !== 'Tutor') {
 **Objetivo:** Proteger rotas administrativas de acesso não autorizado.
 
 **Implementação:**
+
 - Rotas `/admin/*` exigem header `x-admin-key: <secret>`
 - Valor definido em `.env` (`ADMIN_KEY`)
 
 **Exemplo:**
+
 ```typescript
 const adminKey = req.header('x-admin-key');
 if (adminKey !== process.env.ADMIN_KEY) {
@@ -906,12 +978,14 @@ if (adminKey !== process.env.ADMIN_KEY) {
 ### 6. CORS (Cross-Origin Resource Sharing)
 
 **Configuração:**
+
 ```typescript
 import cors from 'cors';
 app.use(cors());  // Permite requisições de qualquer origem
 ```
 
 **Em Produção:** Configurar origens específicas:
+
 ```typescript
 app.use(cors({
   origin: ['https://meu-pet.vercel.app'],
@@ -926,12 +1000,14 @@ app.use(cors({
 ### Escolha do SQLite
 
 **Vantagens:**
+
 - Sem necessidade de servidor de banco de dados separado
 - Ideal para desenvolvimento local e protótipos
 - Transações ACID
 - Suporte a foreign keys e índices
 
 **Desvantagens (Produção):**
+
 - Não suporta múltiplas escritas simultâneas
 - Não é adequado para ambientes distribuídos
 - Escalabilidade limitada
@@ -985,17 +1061,30 @@ CREATE INDEX idx_pets_created ON pets(createdAt DESC);
 ```
 users (1) ──────────< (N) pets
   id                   ownerId (FK)
+                          │
+                          ├────────< (N) agenda
+                          │           petId (FK)
+                          │
+                          └────────< (N) registros_saude
+                                      petId (FK)
 ```
 
+**Relacionamentos:**
 - **Um usuário (Tutor)** pode ter **vários pets**
 - **Um pet** pertence a **apenas um tutor**
+- **Um pet** pode ter **vários agendamentos**
+- **Um pet** pode ter **vários registros de saúde**
+
+**Cascata de Deleção:**
 - **Ao deletar um usuário**, todos os seus pets são deletados automaticamente (`ON DELETE CASCADE`)
+- **Ao deletar um pet**, todos os seus agendamentos e registros de saúde são deletados automaticamente (`ON DELETE CASCADE`)
 
 ### Migrações e Versionamento
 
 **Atualmente:** Migrations automáticas no `db.ts` (executado ao iniciar o servidor).
 
 **Para Produção:**
+
 - Usar ferramentas de migração: `knex`, `prisma migrate`, `typeorm`
 - Versionamento de schema
 - Rollback de migrations
@@ -1042,6 +1131,7 @@ User Browser: http://localhost:8088
 ```
 
 **Vantagens:**
+
 - Ambiente isolado e reproduzível
 - Fácil compartilhamento entre equipe
 - Simula ambiente de produção
@@ -1085,6 +1175,7 @@ User Browser: http://localhost:8088
 ```
 
 **Comunicação:**
+
 ```
 User Browser
    │
@@ -1106,15 +1197,20 @@ User Browser
 **Objetivo:** Validar fluxos completos do usuário, simulando interações reais no navegador.
 
 **Ferramentas:**
+
 - Selenium WebDriver (Python)
 - Chrome/ChromeDriver
 
 **Cobertura:**
+
 1. **test_register_login.py**: Registro e autenticação
 2. **test_pets_flow.py**: Gestão de pets
-3. **test_admin_users_flow.py**: Gestão de usuários (admin)
+3. **test_agenda_flow.py**: Gestão de agenda (agendamentos)
+4. **test_registrosaude_flow.py**: Gestão de registros de saúde
+5. **test_admin_users_flow.py**: Gestão de usuários (admin)
 
 **Exemplo de Teste:**
+
 ```python
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -1141,12 +1237,12 @@ driver.quit()
 
 ### Tipos de Testes Implementados
 
-| Tipo | Descrição | Ferramenta | Status |
-|------|-----------|-----------|--------|
-| E2E | Fluxos completos (registro, login, CRUD) | Selenium | ✅ Implementado |
-| Unitário | Funções individuais (validators, hash) | Jest/Vitest | ⏳ Futuro |
-| Integração | Rotas da API | Supertest | ⏳ Futuro |
-| Performance | Carga e stress | k6/Artillery | ⏳ Futuro |
+| Tipo         | Descrição                              | Ferramenta   | Status          |
+| ------------ | ---------------------------------------- | ------------ | --------------- |
+| E2E          | Fluxos completos (registro, login, CRUD) | Selenium     | ✅ Implementado |
+| Unitário    | Funções individuais (validators, hash) | Jest/Vitest  | ⏳ Futuro       |
+| Integração | Rotas da API                             | Supertest    | ⏳ Futuro       |
+| Performance  | Carga e stress                           | k6/Artillery | ⏳ Futuro       |
 
 ### Boas Práticas de Testes
 
@@ -1170,28 +1266,34 @@ driver.quit()
 ### Roadmap de Evolução
 
 #### Fase 1: Banco de Dados em Produção
+
 - Migrar SQLite → PostgreSQL
 - Usar ORM (Prisma, TypeORM)
 - Connection pooling
 
 #### Fase 2: Armazenamento de Arquivos
+
 - Integrar com S3 / Azure Blob Storage / Cloudinary
 - CDN para servir imagens de pets
 
 #### Fase 3: Cache
+
 - Redis para cache de sessões e dados frequentes
 - Cache de queries (ex: lista de pets)
 
 #### Fase 4: Filas e Background Jobs
+
 - RabbitMQ / BullMQ para tarefas assíncronas
 - Exemplo: envio de emails, processamento de imagens
 
 #### Fase 5: Observabilidade
+
 - Logging estruturado (Winston, Pino)
 - Monitoramento (Datadog, New Relic)
 - Alertas de erros (Sentry)
 
 #### Fase 6: Microserviços (se necessário)
+
 - Separar backend em serviços:
   - Auth Service
   - User Service
@@ -1204,15 +1306,14 @@ driver.quit()
 
 A arquitetura do **Meu Pet em Dia** foi projetada com foco em:
 
-✅ **Manutenibilidade:** Código organizado em camadas bem definidas  
-✅ **Testabilidade:** Desacoplamento via Repository Pattern e Dependency Injection  
-✅ **Segurança:** JWT, hash de senhas, validações server-side  
-✅ **Escalabilidade:** Facilita migração para banco relacional robusto  
-✅ **Qualidade:** Testes E2E automatizados com Selenium  
+✅ **Manutenibilidade:** Código organizado em camadas bem definidas
+✅ **Testabilidade:** Desacoplamento via Repository Pattern e Dependency Injection
+✅ **Segurança:** JWT, hash de senhas, validações server-side
+✅ **Escalabilidade:** Facilita migração para banco relacional robusto
+✅ **Qualidade:** Testes E2E automatizados com Selenium
 
 Para dúvidas ou sugestões de melhoria, consulte o **GUIA_IMPLEMENTACAO.md** ou abra uma issue no GitHub.
 
 ---
 
 **Última atualização:** 2025-11-05
-
