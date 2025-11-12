@@ -9,7 +9,7 @@ Sistema completo de gestão de saúde para pets, conectando tutores e veterinár
 ### ✨ Funcionalidades Principais
 
 - 🔐 **Autenticação Completa**: Sistema de login e registro com JWT
-- 👥 **Dois Tipos de Usuário**: 
+- 👥 **Dois Tipos de Usuário**:
   - **Tutores**: Responsáveis pelos pets
   - **Veterinários**: Profissionais de saúde animal (com CRMV)
 - 🐾 **Gestão de Pets**: Cadastro completo com fotos e informações detalhadas
@@ -23,6 +23,7 @@ Sistema completo de gestão de saúde para pets, conectando tutores e veterinár
 ## 🛠️ Tecnologias Utilizadas
 
 ### Frontend
+
 - **React 18** + **TypeScript**
 - **Vite** - Build tool
 - **React Router** - Navegação
@@ -30,6 +31,7 @@ Sistema completo de gestão de saúde para pets, conectando tutores e veterinár
 - **CSS Modules** - Estilização com variáveis CSS
 
 ### Backend
+
 - **Node.js** + **Express**
 - **TypeScript**
 - **SQLite** (`better-sqlite3`) - Banco de dados local
@@ -38,6 +40,7 @@ Sistema completo de gestão de saúde para pets, conectando tutores e veterinár
 - **Multer** - Upload de arquivos
 
 ### Arquitetura
+
 - **Domain-Driven Design (DDD)**
 - **Repository Pattern**
 - **Single Responsibility Principle (SRP)**
@@ -207,85 +210,89 @@ O frontend estará rodando em `http://localhost:5173`
 
 ### Autenticação (`/auth`)
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| POST | `/auth/register` | Registrar novo usuário (Tutor ou Veterinário) |
-| POST | `/auth/login` | Login de usuário |
-| GET | `/auth/me` | Obter dados do usuário autenticado |
+| Método | Rota               | Descrição                                     |
+| ------- | ------------------ | ----------------------------------------------- |
+| POST    | `/auth/register` | Registrar novo usuário (Tutor ou Veterinário) |
+| POST    | `/auth/login`    | Login de usuário                               |
+| GET     | `/auth/me`       | Obter dados do usuário autenticado             |
 
 ### Administração (`/admin`) - Requer `x-admin-key`
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| POST | `/admin/users` | Criar usuário (admin) |
-| GET | `/admin/users` | Listar todos os usuários |
-| GET | `/admin/users/:id` | Obter usuário por ID |
-| PUT | `/admin/users/:id` | Atualizar usuário |
-| DELETE | `/admin/users/:id` | Deletar usuário |
+| Método | Rota                 | Descrição               |
+| ------- | -------------------- | ------------------------- |
+| POST    | `/admin/users`     | Criar usuário (admin)    |
+| GET     | `/admin/users`     | Listar todos os usuários |
+| GET     | `/admin/users/:id` | Obter usuário por ID     |
+| PUT     | `/admin/users/:id` | Atualizar usuário        |
+| DELETE  | `/admin/users/:id` | Deletar usuário          |
 
 ### Pets (`/pets`) - Requer Autenticação (Tutor)
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/pets` | Listar pets do tutor (com filtros) |
-| POST | `/pets` | Cadastrar novo pet |
-| PUT | `/pets/:id` | Atualizar pet |
-| DELETE | `/pets/:id` | Deletar pet |
+| Método | Rota          | Descrição                        |
+| ------- | ------------- | ---------------------------------- |
+| GET     | `/pets`     | Listar pets do tutor (com filtros) |
+| POST    | `/pets`     | Cadastrar novo pet                 |
+| PUT     | `/pets/:id` | Atualizar pet                      |
+| DELETE  | `/pets/:id` | Deletar pet                        |
 
 ### Agenda (`/agenda`) - Requer Autenticação (Tutor)
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/agenda` | Listar agendamentos do tutor |
-| POST | `/agenda` | Criar novo agendamento |
-| PUT | `/agenda/:id` | Atualizar agendamento |
-| DELETE | `/agenda/:id` | Deletar agendamento |
+| Método | Rota            | Descrição                  |
+| ------- | --------------- | ---------------------------- |
+| GET     | `/agenda`     | Listar agendamentos do tutor |
+| POST    | `/agenda`     | Criar novo agendamento       |
+| PUT     | `/agenda/:id` | Atualizar agendamento        |
+| DELETE  | `/agenda/:id` | Deletar agendamento          |
 
 ### Registros de Saúde (`/registros-saude`) - Requer Autenticação (Tutor)
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/registros-saude` | Listar registros de saúde |
-| POST | `/registros-saude` | Criar novo registro |
-| PUT | `/registros-saude/:id` | Atualizar registro |
-| DELETE | `/registros-saude/:id` | Deletar registro |
+| Método | Rota                     | Descrição                |
+| ------- | ------------------------ | -------------------------- |
+| GET     | `/registros-saude`     | Listar registros de saúde |
+| POST    | `/registros-saude`     | Criar novo registro        |
+| PUT     | `/registros-saude/:id` | Atualizar registro         |
+| DELETE  | `/registros-saude/:id` | Deletar registro           |
 
 ## 🗄️ Modelo de Dados
 
 ### Tabela: `users`
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| id | TEXT | UUID único |
-| name | TEXT | Nome completo |
-| email | TEXT | Email (único) |
-| cpf | TEXT | CPF (único) |
-| phone | TEXT | Telefone |
-| password_hash | TEXT | Senha criptografada |
-| user_type | TEXT | 'tutor' ou 'veterinario' |
-| role | TEXT | 'user' ou 'admin' |
-| crmv | TEXT | CRMV (apenas veterinários) |
-| crmv_doc_path | TEXT | Caminho do documento |
-| created_at | TEXT | Data de criação |
-| updated_at | TEXT | Data de atualização |
+| Campo         | Tipo | Descrição                 |
+| ------------- | ---- | --------------------------- |
+| id            | TEXT | UUID único                 |
+| name          | TEXT | Nome completo               |
+| email         | TEXT | Email (único)              |
+| cpf           | TEXT | CPF (único)                |
+| phone         | TEXT | Telefone                    |
+| password_hash | TEXT | Senha criptografada         |
+| user_type     | TEXT | 'tutor' ou 'veterinario'    |
+| role          | TEXT | 'user' ou 'admin'           |
+| crmv          | TEXT | CRMV (apenas veterinários) |
+| crmv_doc_path | TEXT | Caminho do documento        |
+| created_at    | TEXT | Data de criação           |
+| updated_at    | TEXT | Data de atualização       |
 
 ## 🧪 Validações
 
 ### CPF
+
 - Formato: `000.000.000-00`
 - Validação: 11 dígitos numéricos
 - Máscara automática no frontend
 
 ### Telefone
+
 - Formato: `(00) 00000-0000`
 - Validação: DDD + 9 dígitos
 - Máscara automática no frontend
 
 ### Senha
+
 - Comprimento: 8 a 12 caracteres
 - Validação em tempo real no frontend
 
 ### Email
+
 - Validação de formato padrão
 - Verificação de unicidade no backend
 
@@ -311,58 +318,69 @@ Este projeto está sob a licença MIT.
 
 ---
 
-## Guia Completo: Arquitetura, Docker, Testes (Selenium) e Deploy
+## Guia Completo: Arquitetura, Docker, Testes (Selenium) e Deploy.
 
 ### Padrões Arquiteturais
+
 - Presentation (rotas Express), Application (use cases), Domain (entidades), Infrastructure (repositórios SQLite).
 - Repository Pattern para `User` e `Pet`; SRP/Clean nos casos de uso; middleware `requireAuth`.
 - Validações de entrada com mensagens detalhadas (400) e fallback 500 seguro.
 
 ### Banco de Dados e Uploads
+
 - SQLite (better-sqlite3) para MVP/local e Docker com volumes.
 - Uploads com `multer` em `/uploads` (permitidos: png, jpg/jpeg, webp, gif; até 5MB).
 - Para serverless/backend Vercel, use Postgres gerenciado (Neon/Supabase) ou Turso.
 
 ### Frontend
+
 - React + TS + Vite; Context de Auth; Router; UI responsiva (navbar desktop, bottom‑nav e topbar no mobile).
 - data‑testids em elementos críticos para Selenium.
 
 ### Execução Local (PowerShell)
+
 ```powershell
 cd backend; npm install; echo PORT=3001 > .env; echo JWT_SECRET=dev-secret-123 >> .env; echo ADMIN_KEY=changeme >> .env; npm run dev
 cd frontend; npm install; echo VITE_API_URL=http://localhost:3001 > .env.local; npm run dev
 ```
 
 Seed admin:
+
 ```powershell
 cd backend; npm run seed:admin
 ```
 
 ### Docker
+
 ```powershell
 cd C:\meu_pet; docker compose build; docker compose up -d
 # Frontend: http://localhost:8088  |  Backend: http://localhost:3001
 ```
 
 Porta ocupada:
+
 ```powershell
 netstat -ano | findstr :8080; taskkill /PID <PID> /F
 ```
 
 Rebuild sem cache (frontend em branco):
+
 ```powershell
 docker compose down; docker compose build --no-cache frontend; docker compose up -d
 ```
 
 ### Testes E2E (Selenium)
+
 Scripts em `testes/`: `test_register_login.py`, `test_pets_flow.py`, `test_agenda_flow.py`, `test_registrosaude_flow.py`, `test_admin_users_flow.py`.
 
 Executar tudo com delay e janela visível:
+
 ```powershell
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; .\run.ps1
 ```
 
 Individuais:
+
 ```powershell
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_register_login.py
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_pets_flow.py
@@ -372,17 +390,20 @@ cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_ad
 ```
 
 ### Deploy do Frontend na Vercel
+
 - Root: `frontend`; Build: `npm run build`; Output: `dist`.
 - Variáveis: `VITE_API_URL=https://sua-api-publica`.
 - SPA fallback opcional: `frontend/vercel.json` com rota para `index.html`.
 
 ### Git – Branch e Commit usados
+
 ```powershell
 cd C:\meu_pet; git fetch; git switch -c release-1; git push -u origin release-1
 cd C:\meu_pet; git add .; git commit -m "chore: prepara release-1"; git push -u origin release-1
 ```
 
 ### Troubleshooting Rápido
+
 - Docker Desktop parado: abra o app e rode `docker version`.
 - Erro de porta: use `netstat` e `taskkill` acima.
 - Selenium sem janela: `MEUPET_HEADLESS='0'`; para ritmo mais lento: `MEUPET_E2E_DELAY='1'`.
