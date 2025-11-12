@@ -296,6 +296,13 @@ O frontend estará rodando em `http://localhost:5173`
 - Validação de formato padrão
 - Verificação de unicidade no backend
 
+## 📚 Documentação
+
+Para detalhes sobre a arquitetura e implementação do projeto, consulte:
+
+* [Guia de Arquitetura](./documentation/GUIA_ARQUITETURAL.md)
+* [Guia de Implementação](./documentation/GUIA_IMPLEMENTACAO.md)
+
 ## 🤝 Contribuindo
 
 1. Faça um fork do projeto
@@ -311,7 +318,7 @@ Este projeto está sob a licença MIT.
 ## 👨‍💻 Desenvolvido por
 
 **Junior Santos** - [GitHub](https://github.com/junior875)
-
+**Luara Perilli** - [GitHub](https://github.com/luaraperilli)
 ---
 
 ⭐ Se este projeto foi útil para você, considere dar uma estrela!
