@@ -318,9 +318,7 @@ Este projeto está sob a licença MIT.
 
 ---
 
-## Guia Completo: Arquitetura, Docker, Testes (Selenium) e Deploy.
-
-### Padrões Arquiteturais
+## Guia Completo: Arquitetura, Docker, Testes (Selenium) e Deploy.Padrões Arquiteturais
 
 - Presentation (rotas Express), Application (use cases), Domain (entidades), Infrastructure (repositórios SQLite).
 - Repository Pattern para `User` e `Pet`; SRP/Clean nos casos de uso; middleware `requireAuth`.
