@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoAlertPresentException, TimeoutException
 
 BASE_URL = os.getenv('MEUPET_BASE_URL', 'http://localhost:5173')
-HEADLESS = os.getenv('MEUPET_HEADLESS', '1') != '0'
+HEADLESS = os.getenv('MEUPET_HEADLESS', '0') != '0'
 DELAY = float(os.getenv('MEUPET_E2E_DELAY', '0.5'))
 
 ADMIN_EMAIL = os.getenv('MEUPET_ADMIN_EMAIL', 'admin@gmail.com')

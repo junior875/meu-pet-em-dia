@@ -7,6 +7,8 @@ import { authRouter } from './presentation/routes/auth';
 import { petsRouter } from './presentation/routes/pets';
 import { agendaRouter } from './presentation/routes/agenda';
 import { registrosSaudeRouter } from './presentation/routes/registroSaude';
+import { despesasRouter } from './presentation/routes/despesas';
+import { relatoriosRouter } from './presentation/routes/relatorios';
 
 const app = express();
 app.use(cors());
@@ -29,6 +31,8 @@ app.use('/auth', authRouter);
 app.use('/pets', petsRouter);
 app.use('/agenda', agendaRouter);
 app.use('/registros_saude', registrosSaudeRouter);
+app.use('/despesas', despesasRouter);
+app.use('/relatorios', relatoriosRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 

@@ -81,4 +81,20 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_registros_pet ON registros_saude(petId);
   CREATE INDEX IF NOT EXISTS idx_registros_data ON registros_saude(data DESC, horario DESC);
+
+  -- Despesas Financeiras
+  CREATE TABLE IF NOT EXISTS despesas_financeiras (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    petId INTEGER NOT NULL,
+    categoria TEXT NOT NULL CHECK (categoria IN ('Alimentação','Saúde','Higiene','Acessórios','Hospedagem','Transporte','Outros')),
+    descricao TEXT NOT NULL,
+    valor REAL NOT NULL CHECK (valor > 0),
+    data TEXT NOT NULL,
+    observacoes TEXT,
+    createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
+    FOREIGN KEY(petId) REFERENCES pets(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_despesas_pet ON despesas_financeiras(petId);
+  CREATE INDEX IF NOT EXISTS idx_despesas_data ON despesas_financeiras(data DESC);
+  CREATE INDEX IF NOT EXISTS idx_despesas_categoria ON despesas_financeiras(categoria);
 `);

@@ -7,6 +7,8 @@ import { AdminUsersPage } from '@app/components/AdminUsersPage';
 import { PetsPage } from '@app/components/PetsPage';
 import { AgendaPage } from '@app/components/AgendaPage';
 import { RegistroSaudePage } from '@app/components/RegistroSaudePage';
+import { DespesasPage } from '@app/components/DespesasPage';
+import { RelatoriosPage } from '@app/components/RelatoriosPage';
 
 function Protected({ children }: { children: JSX.Element }) {
   const { user } = useAuth();
@@ -64,9 +66,17 @@ function Dashboard() {
       icon: '💰',
       title: 'Financeiro',
       subtitle: 'Controle de gastos',
-      color: 'linear-gradient(135deg, #6BCF7F, #52B869)',
-      stats: 'Em breve',
-      path: '/financeiro',
+      color: 'linear-gradient(135deg, #FFE66D, #FFB347)',
+      stats: 'Despesas organizadas',
+      path: '/despesas',
+    },
+    {
+      icon: '📊',
+      title: 'Relatórios',
+      subtitle: 'Análise de saúde completa',
+      color: 'linear-gradient(135deg, #4ECDC4, #6BCF7F)',
+      stats: 'Relatórios detalhados',
+      path: '/relatorios',
     },
   ];
 
@@ -229,7 +239,8 @@ export function RootRouter() {
           <Route path="/pets" element={<TutorOnly><PetsPage /></TutorOnly>} />
           <Route path="/agenda" element={<Protected><AgendaPage /></Protected>} />
           <Route path="/registros-saude" element={<Protected><RegistroSaudePage /></Protected>} />
-          <Route path="/financeiro" element={<Protected><div style={{ padding: '32px', textAlign: 'center' }}>Em desenvolvimento...</div></Protected>} />
+          <Route path="/despesas" element={<TutorOnly><DespesasPage /></TutorOnly>} />
+          <Route path="/relatorios" element={<TutorOnly><RelatoriosPage /></TutorOnly>} />
           <Route path="/admin/users" element={<AdminOnly><AdminUsersPage /></AdminOnly>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
