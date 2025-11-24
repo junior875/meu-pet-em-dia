@@ -1,18 +1,19 @@
-import { useEffect, useState, useMemo } from 'react';
-import { API_BASE_URL } from '@lib/api';
+import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../../lib/api';
 import { Agenda } from '../../types/Agenda';
 import { Pet, PetSpecies } from '../../types/Pet';
 import { useToast } from './Toast';
 
 interface AgendaListProps {
   onEdit: (a: Agenda) => void;
+  onAvaliar: (a: Agenda) => void;
   onRefresh: () => void;
   refreshKey: number;
 }
 
 type AgendaItem = Agenda & { petName: string; petSpecies: PetSpecies };
 
-export function AgendaList({ onEdit, onRefresh, refreshKey }: AgendaListProps) {
+export function AgendaList({ onEdit, onAvaliar, onRefresh, refreshKey }: AgendaListProps) {
   const { showToast, ToastComponent } = useToast();
   const [agendas, setAgendas] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,7 @@ export function AgendaList({ onEdit, onRefresh, refreshKey }: AgendaListProps) {
   const [filterName, setFilterName] = useState('');
   const [filterSpecies, setFilterSpecies] = useState<'Todos' | PetSpecies>('Todos');
   const SPECIES_OPTIONS: PetSpecies[] = ['Cachorro', 'Cavalo', 'Gato', 'Outros'];
+  const [hoverCommentId, setHoverCommentId] = useState<number | null>(null);
 
   async function loadAgendasByFilter() {
     setLoading(true);
@@ -65,14 +67,13 @@ export function AgendaList({ onEdit, onRefresh, refreshKey }: AgendaListProps) {
                 petSpecies: pet.species,
             }) as AgendaItem);
         } catch (err) {
-            console.error(`Falha ao carregar agenda para Pet ID ${pet.id}`);
             return [] as AgendaItem[];
         }
     });
 
     try {
         const results = await Promise.all(promises);
-        const allAgendas = results.flat();
+        const allAgendas = results.flat().sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
         setAgendas(allAgendas);
     } catch (err) {
         setError('Erro ao consolidar agendas.');
@@ -109,7 +110,6 @@ export function AgendaList({ onEdit, onRefresh, refreshKey }: AgendaListProps) {
   
   if (loading) return <div style={{ textAlign: 'center', padding: 32 }}>⏳ Carregando agenda...</div>;
   if (error) return <div style={{ textAlign: 'center', padding: 32, color: 'var(--error)' }}>{error}</div>;
-
 
   return (
     <div style={{ padding: '24px 0' }}>
@@ -156,23 +156,89 @@ export function AgendaList({ onEdit, onRefresh, refreshKey }: AgendaListProps) {
                 <thead>
                     <tr style={{ background: 'var(--background)' }}>
                       <th style={{ padding: 12, textAlign: 'left' }}>Pet</th>
-                      <th style={{ padding: 12, textAlign: 'left' }}>Espécie</th>
-                      <th style={{ padding: 12, textAlign: 'left' }}>Data</th>
-                      <th style={{ padding: 12, textAlign: 'left' }}>Horário</th>
+                      <th style={{ padding: 12, textAlign: 'left' }}>Data/Hora</th>
                       <th style={{ padding: 12, textAlign: 'left' }}>Procedimento</th>
                       <th style={{ padding: 12, textAlign: 'left' }}>Profissional</th>
+                      <th style={{ padding: 12, textAlign: 'center' }}>Avaliação</th>
                       <th style={{ padding: 12, textAlign: 'center', width: 140 }}>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {agendas.map((a) => (
                     <tr key={a.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                        <td style={{ padding: 12, fontWeight: 600 }}>{a.petName}</td>
-                        <td style={{ padding: 12 }}>{a.petSpecies}</td>
-                        <td style={{ padding: 12 }}>{a.data}</td>
-                        <td style={{ padding: 12 }}>{a.horario}</td>
+                        <td style={{ padding: 12, fontWeight: 600 }}>
+                          {a.petName}
+                          <br/>
+                          <small style={{ color: 'var(--text-secondary)', fontWeight: 'normal' }}>{a.petSpecies}</small>
+                        </td>
+                        <td style={{ padding: 12 }}>
+                          {new Date(a.data).toLocaleDateString('pt-BR')}
+                          <br/>
+                          {a.horario}
+                        </td>
                         <td style={{ padding: 12 }}>{a.procedimento}</td>
                         <td style={{ padding: 12 }}>{a.profissional || '-'}</td>
+                        <td style={{ padding: 12, textAlign: 'center' }}>
+                          {a.avaliacaoNota ? (
+                            <div 
+                              style={{ position: 'relative', display: 'inline-block', cursor: 'default' }}
+                              onMouseEnter={() => setHoverCommentId(a.id)}
+                              onMouseLeave={() => setHoverCommentId(null)}
+                            >
+                              <span style={{color: '#FFD700'}}>
+                                {'★'.repeat(a.avaliacaoNota)}
+                              </span>
+                              <span style={{color: '#E0E0E0'}}>
+                                {'★'.repeat(5 - a.avaliacaoNota)}
+                              </span>
+
+                              {hoverCommentId === a.id && a.avaliacaoComentario && (
+                                <div style={{
+                                  position: 'absolute',
+                                  bottom: '110%',
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  backgroundColor: '#333',
+                                  color: '#fff',
+                                  padding: '8px 12px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.85rem',
+                                  width: 'max-content',
+                                  maxWidth: '220px',
+                                  textAlign: 'center',
+                                  zIndex: 100,
+                                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                  pointerEvents: 'none',
+                                  whiteSpace: 'normal'
+                                }}>
+                                  {a.avaliacaoComentario}
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: '50%',
+                                    marginLeft: '-6px',
+                                    borderWidth: '6px',
+                                    borderStyle: 'solid',
+                                    borderColor: '#333 transparent transparent transparent'
+                                  }} />
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <button 
+                              onClick={() => onAvaliar(a)}
+                              style={{ 
+                                padding: '4px 12px', 
+                                fontSize: '0.8em', 
+                                background: 'transparent', 
+                                border: '1px solid var(--primary)', 
+                                color: 'var(--primary)' 
+                              }}
+                            >
+                              ☆ Avaliar
+                            </button>
+                          )}
+                        </td>
                         <td style={{ padding: 12, textAlign: 'center' }}>
                           <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
                             <button data-testid={`agenda-edit-${a.id}`} onClick={() => onEdit(a)} style={{ padding: '8px 16px', fontSize: 'var(--text-xs)' }}>

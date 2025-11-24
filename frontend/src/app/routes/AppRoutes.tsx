@@ -43,7 +43,7 @@ function Dashboard() {
       title: 'Meus Pets',
       subtitle: 'Cadastre e gerencie seus pets',
       color: 'linear-gradient(135deg, #FF6B9D, #E8538A)',
-      stats: '0 pets cadastrados',
+      stats: 'Gerencie seus pets',
       path: '/pets',
     },
     {

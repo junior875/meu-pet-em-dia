@@ -62,4 +62,13 @@ export class SqliteAgendaRepository implements AgendaRepository {
     const sql = `SELECT * FROM agenda WHERE petId = ? ORDER BY data, horario`;
     return db.prepare(sql).all(petId) as Agenda[];
   }
+
+  avaliar(id: number, nota: number, comentario: string): void {
+    const stmt = db.prepare(`
+      UPDATE agenda 
+      SET avaliacaoNota = ?, avaliacaoComentario = ? 
+      WHERE id = ?
+    `);
+    stmt.run(nota, comentario, id);
+  }
 }

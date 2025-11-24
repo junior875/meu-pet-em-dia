@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { DespesaFinanceira } from '../../types/DespesaFinanceira';
 import { DespesaList } from './DespesaList';
 import { DespesaModal } from './DespesaModal';
@@ -19,14 +20,38 @@ export function DespesasPage() {
               <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Gerencie os gastos com seus pets</p>
             </div>
           </div>
-          <button 
-            data-testid="btn-open-despesa-modal" 
-            onClick={() => { setEditing(null); setModalOpen(true); }} 
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 24px' }}
-          >
-            <span style={{ fontSize: 20 }}>➕</span>
-            Nova Despesa
-          </button>
+          
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Link to="/relatorios" style={{ textDecoration: 'none' }}>
+              <button 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 8, 
+                  padding: '14px 24px',
+                  background: 'var(--surface)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '14px'
+                }}
+              >
+                <span style={{ fontSize: 20 }}>📊</span>
+                Ver Relatórios
+              </button>
+            </Link>
+
+            <button 
+              data-testid="btn-open-despesa-modal" 
+              onClick={() => { setEditing(null); setModalOpen(true); }} 
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 24px' }}
+            >
+              <span style={{ fontSize: 20 }}>➕</span>
+              Nova Despesa
+            </button>
+          </div>
         </div>
 
         <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-xl)', padding: 32, boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)' }}>
@@ -48,4 +73,3 @@ export function DespesasPage() {
     </div>
   );
 }
-

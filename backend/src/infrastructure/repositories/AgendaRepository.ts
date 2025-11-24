@@ -1,9 +1,10 @@
-import { Agenda, AgendaInputDTO } from '../../domain/Agenda';
+import { Agenda } from '../../domain/Agenda';
 
 export interface AgendaRepository {
-  create(data: AgendaInputDTO): Agenda; 
-  update(id: number, data: Partial<AgendaInputDTO>): Agenda;
-  delete(id: number): void;
+  create(agenda: Omit<Agenda, 'id' | 'createdAt'>): Agenda;
   findById(id: number): Agenda | null;
   findByPetId(petId: number): Agenda[];
+  update(id: number, data: Partial<Omit<Agenda, 'id' | 'petId' | 'createdAt'>>): Agenda;
+  delete(id: number): void;
+  avaliar(id: number, nota: number, comentario: string): void;
 }

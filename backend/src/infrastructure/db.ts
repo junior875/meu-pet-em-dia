@@ -60,6 +60,8 @@ db.exec(`
     horario TEXT NOT NULL,
     profissional TEXT,
     observacoes TEXT,
+    avaliacaoNota INTEGER, 
+    avaliacaoComentario TEXT,
     createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
     FOREIGN KEY(petId) REFERENCES pets(id) ON DELETE CASCADE
   );
@@ -68,14 +70,13 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS registros_saude (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     petId INTEGER NOT NULL,
-    userId INTEGER NOT NULL, -- Quem criou o registro (Tutor ou Veterinário)
+    userId INTEGER NOT NULL,
     tipoRegistro TEXT NOT NULL CHECK (tipoRegistro IN ('Vacina', 'Cirurgia', 'Exame', 'Observação')),
     data TEXT NOT NULL,
     horario TEXT NOT NULL,
-    profissional TEXT NOT NULL, -- Obrigatório pelo RFS13
-    filePath TEXT, -- Caminho do arquivo (PDF/PNG/JPG), pode ser NULL
+    profissional TEXT NOT NULL,
+    filePath TEXT,
     createdAt TEXT NOT NULL DEFAULT (DATETIME('now')),
-    
     FOREIGN KEY(petId) REFERENCES pets(id) ON DELETE CASCADE,
     FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
   );
@@ -98,3 +99,23 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_despesas_data ON despesas_financeiras(data DESC);
   CREATE INDEX IF NOT EXISTS idx_despesas_categoria ON despesas_financeiras(categoria);
 `);
+
+function runMigrations() {
+  try {
+    const columnsAgenda = db.pragma('table_info(agenda)') as Array<{ name: string }>;
+    const hasAvaliacao = columnsAgenda.some(c => c.name === 'avaliacaoNota');
+
+    if (!hasAvaliacao) {
+      console.log('Aplicando migração: Adiciona colunas de avaliação na tabela agenda');
+      db.exec(`
+        ALTER TABLE agenda ADD COLUMN avaliacaoNota INTEGER;
+        ALTER TABLE agenda ADD COLUMN avaliacaoComentario TEXT;
+      `);
+      console.log('Migração concluída.');
+    }
+  } catch (error) {
+    console.error('Erro nas migrações:', error);
+  }
+}
+
+runMigrations();

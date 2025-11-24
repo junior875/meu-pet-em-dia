@@ -14,7 +14,9 @@ export interface Agenda {
   horario: string;
   profissional: string | null;
   observacoes: string | null;
+  avaliacaoNota?: number | null; 
+  avaliacaoComentario?: string | null;
   createdAt: string;
 }
 
-export interface AgendaInputDTO extends Omit<Agenda, 'id' | 'createdAt'> {}
+export interface AgendaInputDTO extends Omit<Agenda, 'id' | 'createdAt' | 'avaliacaoNota' | 'avaliacaoComentario'> {}

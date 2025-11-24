@@ -311,6 +311,7 @@ Este projeto está sob a licença MIT.
 ## 👨‍💻 Desenvolvido por
 
 **Junior Santos** - [GitHub](https://github.com/junior875)
+**Luara Perilli** - [GitHub](https://github.com/luaraperilli)
 
 ---
 
@@ -385,6 +386,9 @@ cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_pe
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_agenda_flow.py
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_registrosaude_flow.py
 cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_admin_users_flow.py
+cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_avaliacao_flow.py
+cd testes; $env:MEUPET_HEADLESS='0'; $env:MEUPET_E2E_DELAY='1'; python .\test_relatorio_financeiro_flow.py
+
 ```
 
 ### Deploy do Frontend na Vercel
