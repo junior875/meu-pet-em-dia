@@ -17,7 +17,7 @@ def make_driver(headless: bool = True):
     options = webdriver.ChromeOptions()
     if headless:
         options.add_argument('--headless=new')
-    options.add_argument('--window-size=1366,900')
+        options.add_argument('--window-size=1366,900')
     prefs = {
         'printing.print_preview_sticky_settings.appState': '{"recentDestinations":[{"id":"Save as PDF","origin":"local","account":""}],"selectedDestinationId":"Save as PDF","version":2}',
         'savefile.default_directory': os.path.join(os.getcwd(), 'relatorios_financeiro_pdf'),
